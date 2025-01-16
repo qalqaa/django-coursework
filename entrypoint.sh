@@ -1,14 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
-until nc -z db 5432; do
-    echo "Ждём, пока Postgres станет доступным..."
-    sleep 1
+echo "Waiting for postgres..."
+while ! nc -z db 5432; do
+  sleep 0.1
 done
-
-echo "Postgres доступен. Выполняем миграции и сбор статики."
+echo "PostgreSQL started"
 
 python manage.py migrate
-
-python manage.py collectstatic --no-input --clear
-
 exec "$@"
