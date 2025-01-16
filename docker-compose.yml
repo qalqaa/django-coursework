@@ -1,11 +1,8 @@
-
 services:
   web:
     build:
       context: .
-    restart: on-failure
     container_name: django_web
-    command: /wait_for_postgres.sh && python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/task_manager
     ports:
@@ -16,6 +13,7 @@ services:
       - db
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
   db:
     image: postgres:15

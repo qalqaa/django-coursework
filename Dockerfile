@@ -10,11 +10,9 @@ RUN apt-get update && apt-get install -y \
     libpq-dev && \
     apt-get clean
 
-# Копируем скрипт ожидания
-COPY wait_for_postgres.sh /task_manager/wait_for_postgres.sh
-
-# Делаем скрипт исполнимым
-RUN chmod +x /task_manager/wait_for_postgres.sh
+# Устанавливаем переменные окружения
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
 # Копируем файл зависимостей
 COPY requirements.txt .
@@ -25,8 +23,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Копируем весь проект
 COPY . .
 
+# Копируем entrypoint.sh
+COPY entrypoint.sh /task_manager/entrypoint.sh
+
+# Делаем entrypoint.sh исполнимым
+RUN chmod +x /task_manager/entrypoint.sh
+
 # Экспортируем порт приложения
 EXPOSE 8000
 
-# Запуск сервера разработки Django
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Устанавливаем entrypoint
+ENTRYPOINT ["/task_manager/entrypoint.sh"]
